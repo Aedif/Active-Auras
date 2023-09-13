@@ -136,10 +136,11 @@ export class ActiveAuras {
       const auraTargets = auraEffect.data.flags?.ActiveAuras?.aura;
 
       const { radius, height, hostile, wildcard, extra } = (auraEffect.data.flags?.ActiveAuras ?? {});
-      let { type, alignment } = (auraEffect.data.flags?.ActiveAuras ?? {});
+      let { type, alignment, customCheck } = (auraEffect.data.flags?.ActiveAuras ?? {});
       type = type?.toLowerCase() ?? "";
       alignment = alignment?.toLowerCase() ?? "";
       if (alignment && !tokenAlignment.includes(alignment) && !tokenAlignment.includes("any")) continue;
+      if(customCheck && !evaluateCustomCheck(canvasToken, customCheck)) continue; 
 
       let auraEntity, distance;
       /*
@@ -380,4 +381,11 @@ export class ActiveAuras {
     Logger.debug("movement, main aura");
     await ActiveAuras.MainAura(token, "movement update", token.parent.id);
   }
+}
+
+function evaluateCustomCheck(token, check) {
+  try {
+    return Boolean(eval(check.trim()))
+  } catch (e) {}
+  return false;
 }
